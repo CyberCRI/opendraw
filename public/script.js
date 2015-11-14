@@ -2,12 +2,15 @@ var stage = new PIXI.Stage(0x66FF99);
 var canvasWidth = 700;
 var canvasHeight = 500;
 var renderer = PIXI.autoDetectRenderer(canvasWidth, canvasHeight);
+var canvas = document.getElementsByTagName('canvas');
 
 var traits = [];
 var z = 1;
 var widthTrait = canvasHeight/16;
 var traitSelect = 0;
 var mouseIsDown = false;
+console.log(canvas);
+var count = 0;
 
 var mouse = {
 	x: 0,
@@ -50,7 +53,19 @@ Trait.prototype.draw = function(data) {
 		this.w.push(widthTrait/z);
 		this.x.push(data[0]/z);
 		this.y.push(data[1]/z);
-		console.log(this.w,this.x,this.y);
+		// console.log(this.w,this.x,this.y);
+		if(this.x.length == 1){
+			graphics.lineStyle(this.w[0],0x000000);
+			graphics.moveTo(this.x[0],this.y[0]);
+		}else{
+			if(this.x.length != 0){
+				graphics.lineStyle(this.w[this.x.length-1],0x000000);
+				graphics.lineTo(this.x[this.x.length-1],this.y[this.x.length-1]);
+				console.log(this.x[this.x.length-1],' ',this.y[this.x.length-1]);
+				count++;
+				console.log(count);
+			}
+		}
 	}
 }
 // comment qu'on l'appel la class
@@ -78,15 +93,9 @@ document.addEventListener("mouseup", function(event){
 	console.log('traitSelect: ',traitSelect);
 });
 
-document.addEventListener('mousemove' , function(event) {
-	var clientRect = canvas.getBoundingClientRect();
-	var mouseX = event.clientX-clientRect.left;
-	var mouseY = event.clientY-clientRect.top;
-	if(mouseX < canvas.width && mouseX >= 0 &&
-		mouseY < canvas.height && mouseY >= 0) {
-		that.mouse.x = mouseX;
-		that.mouse.y = mouseY;
-	}
+canvas[0].addEventListener('mousemove' , function(event) {
+	mouse.x = event.offsetX;
+	mouse.y = event.offsetY;
 });
 
 
@@ -96,7 +105,7 @@ var graphics = new PIXI.Graphics();
 graphics.lineStyle(widthTrait,0x000000);
 graphics.moveTo(50,50);
 graphics.lineTo(250,50);
-graphics.lineTo(350,100);
+graphics.lineTo(300,300);
 
 stage.addChild(graphics);
 
@@ -104,7 +113,7 @@ stage.addChild(graphics);
 
 function animate() {
 	requestAnimationFrame(animate);
-	traits[traitSelect].draw([event.x,event.y]);
+	traits[traitSelect].draw([mouse.x,mouse.y]);
 	renderer.render(stage);
 }
 
